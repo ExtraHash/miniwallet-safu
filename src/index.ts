@@ -26,12 +26,6 @@ async function main() {
             res.sendStatus(400);
             return;
         }
-        const hash = hashUser(submittedUser);
-        if (hash !== submittedUser.userHash) {
-            res.sendStatus(400);
-            return;
-        }
-
         try {
             await storage.createUserRecord(submittedUser);
             res.sendStatus(200);
@@ -92,23 +86,3 @@ async function main() {
 }
 
 main();
-
-export const hashUser = (user: Partial<IUserRecord>): string => {
-    const hashData: Partial<IUserRecord> = { ...user };
-
-    if (
-        !hashData.username ||
-        !hashData.passwordHash ||
-        !hashData.salt ||
-        !hashData.address
-    ) {
-        throw new Error(
-            "at least username, passwordhash, salt, and address are required"
-        );
-    }
-    delete hashData.recordID;
-    delete hashData.userID;
-    delete hashData.userHash;
-    delete hashData.createdAt;
-    return objectHash(hashData);
-};
